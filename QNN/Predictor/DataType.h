@@ -34,6 +34,17 @@ enum PostType{
     POST_DMS_MTYOLOX
 };
 
+struct Attribute{
+    std::string label;
+    double score;
+};
+
+struct Object{
+    cv::Rect bbox;
+    int label;
+    double score;
+};
+
 struct Input{
     unsigned char* data;
     int width;
@@ -53,6 +64,8 @@ struct Tensor{
 struct NetData{
     std::vector<float*> data;
     std::vector<NCHW> shapes;
+    double sx;
+    double sy;
 
     void clear(){
         this->data.clear();

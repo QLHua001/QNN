@@ -34,6 +34,12 @@ bool Predictor::init(const Config* config){
     case PostType::POST_DMS_MTFACE:{
         this->_postProcessor = new PostDMSMTFace;
         this->_postProcessor->init(config->postConfig);
+        break;
+    }
+    case PostType::POST_DMS_MTYOLOX:{
+        this->_postProcessor = new PostDMSMTYolox;
+        this->_postProcessor->init(config->postConfig);
+        break;
     }
     }
 

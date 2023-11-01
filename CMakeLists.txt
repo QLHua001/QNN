@@ -34,11 +34,15 @@ elseif(CMAKE_HOST_UNIX)
 
 endif()
 
+include_directories(./)
 set(SRC_QNN
-    QNN/Predictor.cpp
-    QNN/PreProcessor.cpp
-    QNN/NetNCNN.cpp
-    QNN/PostDMSMTFace.cpp)
+    QNN/Predictor/Predictor.cpp
+    QNN/Predictor/PreProcessor.cpp
+    QNN/Predictor/NetNCNN.cpp
+    QNN/Predictor/PostDMSMTFace.cpp
+    QNN/Predictor/PostDMSMTYolox.cpp
+    QNN/AIDetector/AIDMSMTFace.cpp
+    QNN/AIDetector/AIDMSMTYolox.cpp)
 
 set(LIB_LIST ${OpenCV_LIBS} ${NCNN_LIBS})
 set(SRC_LIST main.cpp ${SRC_QNN})

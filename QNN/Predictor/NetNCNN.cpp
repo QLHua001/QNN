@@ -67,4 +67,6 @@ void NetNCNN::run(const Tensor* tensor, NetData* netData){
         netData->data.push_back(this->_cache[i]);
         netData->shapes.push_back(this->_config.outputShapes[i]);
     }
+    netData->sx = tensor->sx;
+    netData->sy = tensor->sy;
 }

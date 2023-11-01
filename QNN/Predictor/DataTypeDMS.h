@@ -3,16 +3,7 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 
-struct Attribute{
-    std::string label;
-    double score;
-};
-
-struct Object{
-    cv::Rect bbox;
-    std::string label;
-    double score;
-};
+#include "DataType.h"
 
 struct DMSMTYolox : Output{
     std::vector<Object> objects;
