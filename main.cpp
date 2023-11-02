@@ -201,6 +201,8 @@ void test_AIDMSMTFace(){
         printf("%s: %.2f\n", attribute.label.c_str(), attribute.score);
     }
 
+    cv::imwrite("./temp/showImg.jpg", showImg);
+
     delete AiDetector;
 
 }
@@ -211,7 +213,7 @@ void test_AIDMSMTYolox(){
 
     AiDMSMTYolox->init();
 
-    std::string testImgPath{"./example/test.jpg"};
+    std::string testImgPath{"./example/test003.jpg"};
     cv::Mat testImg = cv::imread(testImgPath);
     if(testImg.empty()){
         printf("cv::imread fail!(%s)\n", testImgPath.c_str());
@@ -247,6 +249,72 @@ void test_AIDMSMTYolox(){
 
 }
 
+void test_AIDMSMT(){
+    std::string testImgPath{"./temp/test002.jpg"};
+
+    AIDetector* AiDMSMTYolox = new AIDMSMTYolox;
+    AiDMSMTYolox->init();
+
+    AIDetector* AiDMSMTFace = new AIDMSMTFace;
+    AiDMSMTFace->init();
+
+    cv::Mat testImg = cv::imread(testImgPath);
+    if(testImg.empty()){
+        printf("imread fail!(%s)\n", testImgPath.c_str());
+        return;
+    }
+
+    Input input;
+    input.data = testImg.data;
+    input.width = testImg.cols;
+    input.height = testImg.rows;
+    input.format = ImgFormat::FMT_BGR888;
+
+    DMSMTYolox output;
+    AiDMSMTYolox->run(&input, &output);
+
+    cv::Mat showImg = testImg.clone();
+    for(int i = 0; i < output.objects.size(); i++){
+        Object& obj = output.objects[i];
+        cv::rectangle(showImg, obj.bbox, cv::Scalar(0, 255, 0), 1);
+        if(obj.label != 0) continue; // 不是人脸， 跳过
+
+        cv::Rect faceRoi = obj.bbox;
+        cv::Mat faceImg = testImg(faceRoi);
+        // cv::imwrite("./temp/faceImg.jpg", faceImg);
+        if(!faceImg.isContinuous()) faceImg = faceImg.clone();
+
+        Input input2;
+        input2.data = faceImg.data;
+        input2.width = faceImg.cols;
+        input2.height = faceImg.rows;
+        input2.format = ImgFormat::FMT_BGR888;
+
+        DMSMTFace output2;
+        AiDMSMTFace->run(&input2, &output2);
+
+        LandmarkType landmarkType = output2.landmark.type;
+        switch(landmarkType){
+        case LandmarkType::BSJ_20:{
+            for(int i = 0; i < 20; i++){
+                cv::Point2f pt = output2.landmark.points[i];
+                pt.x *= faceImg.cols;
+                pt.y *= faceImg.rows;
+                pt.x += faceRoi.x;
+                pt.y += faceRoi.y;
+                cv::circle(showImg, pt, 1, cv::Scalar(0, 0, 255), -1);
+            }
+            break;
+        }
+        }
+
+    }
+    cv::imwrite("./temp/showImg.jpg", showImg);
+
+    delete AiDMSMTFace;
+    delete AiDMSMTYolox;
+}
+
 int main(int, char**){
     std::cout << "Hello, from QNN!\n";
 
@@ -256,7 +324,9 @@ int main(int, char**){
 
     // test_AIDMSMTFace();
 
-    test_AIDMSMTYolox();
+    // test_AIDMSMTYolox();
+
+    test_AIDMSMT();
 
     return 0;
 }
